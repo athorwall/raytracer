@@ -4,6 +4,7 @@ use cgmath::{
     Point3,
     Angle,
     SquareMatrix,
+    Vector3,
     Vector4,
 };
 use collision::{
@@ -70,6 +71,20 @@ impl Camera {
         Point3::from((world_coordinates.x, world_coordinates.y, world_coordinates.z))
     }
 
+    /// Returns a ray that originates at the camera's eye and passes through the point in world
+    /// space corresponding to the center of the specified pixel.
+    pub fn pixel_ray(&self, x: usize, y: usize) -> Ray3<f32> {
+        let eye = self.world_eye();
+        Ray3::new(eye, self.pixel_to_world(x, y) - eye)
+    }
+
+    /// Returns the position of the camera's eye in world space.
+    pub fn world_eye(&self) -> Point3<f32> {
+        let eye_coordinates = self.eye * Vector4{ x: 0.0, y: 0.0, z: 0.0, w: 1.0 };
+        Point3{ x: eye_coordinates.x, y: eye_coordinates.y, z: eye_coordinates.z }
+    }
+
+    /// Returns the aspect ratio of the camera's image.
     pub fn aspect(&self) -> f32 {
         self.image_resolution.0 as f32 / self.image_resolution.1 as f32
     }
@@ -105,6 +120,14 @@ mod tests {
     }
 
     #[test]
+    fn test_eye() {
+        let mut camera = CameraTest::new().camera;
+        assert_eq!(camera.world_eye(), Point3{x: 0.0, y: 0.0, z: 0.0});
+        camera.eye = Matrix4::from_translation(Vector3{x: -1.0, y: 1.0, z: 1.0});
+        assert_eq!(camera.world_eye(), Point3{x: -1.0, y: 1.0, z: 1.0});
+    }
+
+    #[test]
     fn test_aspect() {
         let camera = CameraTest::new().camera;
         assert_eq!(camera.aspect(), 1.0);
@@ -118,10 +141,24 @@ mod tests {
 
     #[test]
     fn test_pixel_to_world() {
-        let camera = CameraTest::new().camera;
+        let mut camera = CameraTest::new().camera;
         assert_eq!(camera.pixel_to_world(0, 0), Point3{ x: -0.5, y: 0.5, z: -1.0 });
         assert_eq!(camera.pixel_to_world(1, 0), Point3{ x: 0.5, y: 0.5, z: -1.0 });
         assert_eq!(camera.pixel_to_world(0, 1), Point3{ x: -0.5, y: -0.5, z: -1.0 });
         assert_eq!(camera.pixel_to_world(1, 1), Point3{ x: 0.5, y: -0.5, z: -1.0 });
+        camera.eye = Matrix4::from_translation(Vector3{x: 1.0, y: 1.0, z: 1.0});
+        assert_eq!(camera.pixel_to_world(0, 0), Point3{ x: 0.5, y: 1.5, z: 0.0 });
+        assert_eq!(camera.pixel_to_world(1, 0), Point3{ x: 1.5, y: 1.5, z: 0.0 });
+        assert_eq!(camera.pixel_to_world(0, 1), Point3{ x: 0.5, y: 0.5, z: 0.0 });
+        assert_eq!(camera.pixel_to_world(1, 1), Point3{ x: 1.5, y: 0.5, z: 0.0 });
+    }
+
+    #[test]
+    fn test_pixel_ray() {
+        let camera = CameraTest::new().camera;
+        assert_eq!(camera.pixel_ray(0, 0), Ray3::new(
+            Point3{x: 0.0, y: 0.0, z: 0.0},
+            Vector3{x: -0.5, y: 0.5, z: -1.0},
+        ));
     }
 }
