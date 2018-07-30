@@ -11,7 +11,8 @@ use collision::{
     Ray3,
 };
 
-struct Camera {
+#[derive(Copy, Clone, Debug)]
+pub struct Camera {
     /// The distance from the eye to the near clipping plane.
     pub near: f32,
 

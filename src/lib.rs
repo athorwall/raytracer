@@ -7,3 +7,4 @@ pub mod color;
 pub mod draw;
 pub mod frame;
 pub mod sdl;
+pub mod trace;
