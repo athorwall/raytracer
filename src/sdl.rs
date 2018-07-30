@@ -1,8 +1,8 @@
 use frame::Frame;
 use sdl2;
 use sdl2::*;
+use color::*;
 use sdl2::{
-    pixels::Color,
     render::Canvas,
     video::Window,
 };
@@ -40,7 +40,7 @@ pub fn render_to_canvas(
     texture.with_lock(None, |buffer: &mut [u8], pitch: usize| {
         for y in 0..color_buffer.height() {
             for x in 0..color_buffer.width() {
-                let pixel = color_buffer.at(x, y).unwrap();
+                let pixel = color_buffer.at(x, y).unwrap().as_sdl_color();
                 let offset = y * pitch + x * 4;
                 buffer[offset] = pixel.b;
                 buffer[offset + 1] = pixel.g;
