@@ -19,10 +19,6 @@ use sdl2::{
 };
 
 fn main() {
-    let ctx = sdl2::init().unwrap();
-    let mut events = ctx.event_pump().unwrap();
-    let mut canvas = create_sdl_canvas(&ctx, 1200, 900);
-
     let camera = {
         let mut mutable_camera = Camera::default();
         mutable_camera.eye = Matrix4::from_translation(Vector3 { x: 0.0, y: 0.0, z: 5.0 });
@@ -36,21 +32,31 @@ fn main() {
                 center: Point3 { x: 0.0, y: 0.0, z: 0.0 },
                 radius: 1.0,
             }),
+            Box::from(Sphere {
+                center: Point3 { x: 2.0, y: 0.0, z: -3.0 },
+                radius: 1.0,
+            }),
         ],
         camera,
     };
+
+    draw_and_wait(&scene);
+}
+
+fn draw_and_wait(scene: &RenderScene) {
+    let ctx = sdl2::init().unwrap();
+    let mut events = ctx.event_pump().unwrap();
+    let mut canvas = create_sdl_canvas(&ctx, 1200, 900);
 
     let frame = draw(&scene);
     render_to_canvas(&mut canvas, &frame);
 
     'main: loop {
-
         for event in events.poll_iter() {
             match event {
                 Event::Quit{..} => break 'main,
                 _               => continue
             }
         }
-
     }
 }

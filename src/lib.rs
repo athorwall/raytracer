@@ -6,5 +6,6 @@ pub mod camera;
 pub mod color;
 pub mod draw;
 pub mod frame;
+pub mod light;
 pub mod sdl;
 pub mod trace;
