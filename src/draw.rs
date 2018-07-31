@@ -52,7 +52,7 @@ pub fn cast_ray(scene: &RenderScene, ray: &Ray3<f32>) -> Option<Color> {
                             current
                         }
                     },
-                    _ => current,
+                    _ => (Some(hit), Some(distance))
                 };
             },
             None => continue,

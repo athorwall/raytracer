@@ -21,11 +21,12 @@ use sdl2::{
 fn main() {
     let ctx = sdl2::init().unwrap();
     let mut events = ctx.event_pump().unwrap();
-    let mut canvas = create_sdl_canvas(&ctx, 1000, 800);
+    let mut canvas = create_sdl_canvas(&ctx, 1200, 900);
 
     let camera = {
         let mut mutable_camera = Camera::default();
-        mutable_camera.eye = Matrix4::from_translation(Vector3 { x: 0.0, y: 0.0, z: 1.0 });
+        mutable_camera.eye = Matrix4::from_translation(Vector3 { x: 0.0, y: 0.0, z: 5.0 });
+        mutable_camera.image_resolution = (1200, 900);
         mutable_camera
     };
 

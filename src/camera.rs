@@ -1,8 +1,9 @@
 use cgmath::{
+    Angle,
     Deg,
+    InnerSpace,
     Matrix4,
     Point3,
-    Angle,
     SquareMatrix,
     Vector3,
     Vector4,
@@ -76,7 +77,9 @@ impl Camera {
     /// space corresponding to the center of the specified pixel.
     pub fn pixel_ray(&self, x: usize, y: usize) -> Ray3<f32> {
         let eye = self.world_eye();
-        Ray3::new(eye, self.pixel_to_world(x, y) - eye)
+        let dir = self.pixel_to_world(x, y) - eye;
+        let normalized_dir = dir / dir.magnitude();
+        Ray3::new(eye, normalized_dir)
     }
 
     /// Returns the position of the camera's eye in world space.
