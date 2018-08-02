@@ -14,7 +14,7 @@ pub struct Light {
 }
 
 impl Light {
-    pub fn point_light(pos: Vector3<f32>) -> Self {
+    pub fn point_light(pos: Point3<f32>) -> Self {
         Light{
             light_type: LightType::Point(PointLight{
                 position: pos,
@@ -41,7 +41,7 @@ pub enum LightType {
 }
 
 pub struct PointLight {
-    pub position: Vector3<f32>,
+    pub position: Point3<f32>,
 }
 
 pub struct DirectionalLight {

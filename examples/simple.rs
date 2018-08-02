@@ -53,7 +53,7 @@ fn main() {
         lighting: Lighting {
             ambient: Color::from_rgb(0.0, 0.0, 0.0),
             lights: vec![
-                Light::point_light(Vector3 { x: 3.0, y: 3.0, z: 3.0 }),
+                Light::point_light(Point3 { x: 3.0, y: 3.0, z: 3.0 }),
             ],
         },
     };

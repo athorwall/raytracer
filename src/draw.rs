@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 use camera::*;
 use color::*;
 use frame::*;
@@ -70,11 +72,20 @@ pub fn cast_ray(scene: &RenderScene, ray: &Ray3<f32>) -> Option<Color> {
 
 fn draw_hit(scene: &RenderScene, ray: &Ray3<f32>, hit: &SceneObjectHit) -> Option<Color> {
     let light_color = scene.lighting.lights.iter()
-        .map(|light| { compute_light(scene, ray, hit) })
+        .map(|light| { compute_light(light, scene, ray, hit) })
         .sum();
     Some(light_color)
 }
 
-fn compute_light(scene: &RenderScene, ray: &Ray3<f32>, hit: &SceneObjectHit) -> Color {
-    Color::from_rgb(1.0, 1.0, 1.0)
+fn compute_light(light: &Light, scene: &RenderScene, ray: &Ray3<f32>, hit: &SceneObjectHit) -> Color {
+    match light.light_type {
+        LightType::Point(ref point_light) => {
+            let light_direction = point_light.position - hit.solid.point;
+            let normalized_light_direction = light_direction / light_direction.magnitude();
+            let angle = light_direction.dot(hit.solid.normal);
+            let nonnegative_angle = if angle < 0.0 { 0.0 } else { angle };
+            light.color * (hit.material.albedo / PI * nonnegative_angle)
+        },
+        _ => panic!("oh nooooooo"),
+    }
 }
