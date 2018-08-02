@@ -10,49 +10,72 @@ use collision::{
     Sphere,
 };
 use color::*;
+use material::*;
 use collision;
 
-/// A `TraceHit` object describes the nature of the intersection between a `Ray` and
-/// a particular `Traceable` object, including the point of intersection and the
-/// normal and material properties of the object's surface at that point.
+/// A `SolidHit` object describes the nature of the intersection between a `Ray` and
+/// a particular `Solid` object, including the point of intersection and the
+/// normal of the solid's surface at that point.
 ///
 /// All points and vectors are in world space.
 #[derive(Copy, Debug, Clone)]
-pub struct TraceHit {
+pub struct SolidHit {
     /// The point of intersection.
     pub point: Point3<f32>,
 
     /// The normal of the object's surface at the point of intersection.
     pub normal: Vector3<f32>,
-
-    /// The material properties of the object's surface at the point of intersection.
-    // To be replaced by Material, or something like that, later.
-    pub color: Color,
 }
 
-/// Types implement `Traceable` if they can be "traced", i.e. they can provide information
-/// about whether a particular ray intersects with them, and the details of that intersection
-/// if so.
-pub trait Traceable {
-    /// If `ray` intersects this object, `trace` returns a `TraceHit` object detailing this
+pub trait Solid {
+    /// If `ray` intersects this object, `trace` returns a `SolidHit` object detailing this
     /// intersection; otherwise it returns `None`.
-    fn trace(&self, ray: &Ray3<f32>) -> Option<TraceHit>;
+    fn trace(&self, ray: &Ray3<f32>) -> Option<SolidHit>;
 }
 
-impl Traceable for Sphere<f32> {
-    fn trace(&self, ray: &Ray3<f32>) -> Option<TraceHit> {
+impl Solid for Sphere<f32> {
+    fn trace(&self, ray: &Ray3<f32>) -> Option<SolidHit> {
         match Sphere::intersection(self, ray) {
             Some(intersection) => {
                 let unnormalized_normal = intersection - self.center;
                 let normal = unnormalized_normal / unnormalized_normal.magnitude();
-                Some(TraceHit {
+                Some(SolidHit {
                     point: intersection,
                     normal,
-                    // TODO: materials!
-                    color: Color::from_rgb(1.0, 0.0, 0.0),
                 })
             },
             None => None
+        }
+    }
+}
+
+#[derive(Copy, Debug, Clone)]
+pub struct SceneObjectHit {
+    pub solid: SolidHit,
+    pub material: Material,
+}
+
+pub trait SceneObject {
+    /// If `ray` intersects this object, `trace` returns a `SceneObjectHit` object detailing this
+    /// intersection; otherwise it returns `None`.
+    fn trace(&self, ray: &Ray3<f32>) -> Option<SceneObjectHit>;
+}
+
+pub struct SimpleObject {
+    pub solid: Box<Solid>,
+    pub material: Material,
+}
+
+impl SceneObject for SimpleObject {
+    fn trace(&self, ray: &Ray3<f32>) -> Option<SceneObjectHit> {
+        match self.solid.trace(ray) {
+            Some(hit) => {
+                Some(SceneObjectHit {
+                    solid: hit,
+                    material: self.material,
+                })
+            },
+            None => None,
         }
     }
 }

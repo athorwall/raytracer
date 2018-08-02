@@ -1,7 +1,8 @@
-use trace::*;
 use camera::*;
-use frame::*;
 use color::*;
+use frame::*;
+use light::*;
+use trace::*;
 use cgmath::{
     InnerSpace,
 };
@@ -12,8 +13,9 @@ use collision::{
 /// A `RenderScene` is a scene that requires no additional processing (e.g. transformations)
 /// prior to being rendered.
 pub struct RenderScene {
-    pub objects: Vec<Box<Traceable>>,
+    pub objects: Vec<Box<Solid>>,
     pub camera: Camera,
+    pub lighting: Lighting,
 }
 
 pub fn draw(scene: &RenderScene) -> Frame<Color> {
@@ -39,7 +41,7 @@ pub fn draw(scene: &RenderScene) -> Frame<Color> {
 }
 
 pub fn cast_ray(scene: &RenderScene, ray: &Ray3<f32>) -> Option<Color> {
-    let mut current: (Option<TraceHit>, Option<f32>) = (None, None);
+    let mut current: (Option<SolidHit>, Option<f32>) = (None, None);
     for object in &scene.objects {
         match object.trace(&ray) {
             Some(hit) => {
@@ -60,8 +62,19 @@ pub fn cast_ray(scene: &RenderScene, ray: &Ray3<f32>) -> Option<Color> {
     }
     match current {
         (Some(hit), _) => {
-            Some(hit.color)
+            draw_hit(scene, ray, &hit)
         },
         _ => None,
     }
+}
+
+fn draw_hit(scene: &RenderScene, ray: &Ray3<f32>, hit: &SolidHit) -> Option<Color> {
+    let light_color = scene.lighting.lights.iter()
+        .map(|light| { compute_light(scene, ray, hit) })
+        .sum();
+    Some(light_color)
+}
+
+fn compute_light(scene: &RenderScene, ray: &Ray3<f32>, hit: &SolidHit) -> Color {
+    Color::from_rgb(1.0, 1.0, 1.0)
 }

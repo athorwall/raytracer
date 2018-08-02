@@ -3,9 +3,13 @@ extern crate raytracer;
 extern crate collision;
 extern crate cgmath;
 
-use raytracer::sdl::*;
-use raytracer::draw::*;
-use raytracer::camera::*;
+use raytracer::{
+    camera::*,
+    color::*,
+    draw::*,
+    light::*,
+    sdl::*,
+};
 use collision::{
     Sphere,
 };
@@ -38,6 +42,12 @@ fn main() {
             }),
         ],
         camera,
+        lighting: Lighting {
+            ambient: Color::from_rgb(0.0, 0.0, 0.0),
+            lights: vec![
+                Light::point_light(Vector3 { x: 3.0, y: 3.0, z: 3.0 }),
+            ],
+        },
     };
 
     draw_and_wait(&scene);
