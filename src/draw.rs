@@ -13,7 +13,7 @@ use collision::{
 /// A `RenderScene` is a scene that requires no additional processing (e.g. transformations)
 /// prior to being rendered.
 pub struct RenderScene {
-    pub objects: Vec<Box<Solid>>,
+    pub objects: Vec<Box<SceneObject>>,
     pub camera: Camera,
     pub lighting: Lighting,
 }
@@ -41,11 +41,11 @@ pub fn draw(scene: &RenderScene) -> Frame<Color> {
 }
 
 pub fn cast_ray(scene: &RenderScene, ray: &Ray3<f32>) -> Option<Color> {
-    let mut current: (Option<SolidHit>, Option<f32>) = (None, None);
+    let mut current: (Option<SceneObjectHit>, Option<f32>) = (None, None);
     for object in &scene.objects {
         match object.trace(&ray) {
             Some(hit) => {
-                let distance = (hit.point - ray.origin).magnitude();
+                let distance = (hit.solid.point - ray.origin).magnitude();
                 current = match current {
                     (Some(previous_hit), Some(previous_distance)) => {
                         if distance < previous_distance {
@@ -68,13 +68,13 @@ pub fn cast_ray(scene: &RenderScene, ray: &Ray3<f32>) -> Option<Color> {
     }
 }
 
-fn draw_hit(scene: &RenderScene, ray: &Ray3<f32>, hit: &SolidHit) -> Option<Color> {
+fn draw_hit(scene: &RenderScene, ray: &Ray3<f32>, hit: &SceneObjectHit) -> Option<Color> {
     let light_color = scene.lighting.lights.iter()
         .map(|light| { compute_light(scene, ray, hit) })
         .sum();
     Some(light_color)
 }
 
-fn compute_light(scene: &RenderScene, ray: &Ray3<f32>, hit: &SolidHit) -> Color {
+fn compute_light(scene: &RenderScene, ray: &Ray3<f32>, hit: &SceneObjectHit) -> Color {
     Color::from_rgb(1.0, 1.0, 1.0)
 }

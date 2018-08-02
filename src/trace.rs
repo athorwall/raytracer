@@ -68,14 +68,11 @@ pub struct SimpleObject {
 
 impl SceneObject for SimpleObject {
     fn trace(&self, ray: &Ray3<f32>) -> Option<SceneObjectHit> {
-        match self.solid.trace(ray) {
-            Some(hit) => {
-                Some(SceneObjectHit {
-                    solid: hit,
-                    material: self.material,
-                })
-            },
-            None => None,
-        }
+        self.solid.trace(ray).map(|hit| {
+            SceneObjectHit {
+                solid: hit,
+                material: self.material,
+            }
+        })
     }
 }

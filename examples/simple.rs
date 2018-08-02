@@ -9,6 +9,8 @@ use raytracer::{
     draw::*,
     light::*,
     sdl::*,
+    trace::*,
+    material::*,
 };
 use collision::{
     Sphere,
@@ -32,13 +34,19 @@ fn main() {
 
     let scene = RenderScene {
         objects: vec![
-            Box::from(Sphere {
-                center: Point3 { x: 0.0, y: 0.0, z: 0.0 },
-                radius: 1.0,
+            Box::from(SimpleObject {
+                solid: Box::from(Sphere {
+                    center: Point3 { x: 0.0, y: 0.0, z: 0.0 },
+                    radius: 1.0,
+                }),
+                material: Material::new(),
             }),
-            Box::from(Sphere {
-                center: Point3 { x: 2.0, y: 0.0, z: -3.0 },
-                radius: 1.0,
+            Box::from(SimpleObject {
+                solid: Box::from(Sphere {
+                    center: Point3 { x: 2.0, y: 0.0, z: -3.0 },
+                    radius: 1.0,
+                }),
+                material: Material::new(),
             }),
         ],
         camera,
