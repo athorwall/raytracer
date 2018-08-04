@@ -14,13 +14,13 @@ pub struct Light {
 }
 
 impl Light {
-    pub fn point_light(pos: Point3<f32>) -> Self {
+    pub fn point_light(pos: Point3<f32>, intensity: f32, color: Color) -> Self {
         Light{
             light_type: LightType::Point(PointLight{
                 position: pos,
             }),
-            color: Color::from_rgb(1.0, 1.0, 1.0),
-            intensity: 1.0,
+            color,
+            intensity,
         }
     }
 
