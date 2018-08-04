@@ -8,6 +8,7 @@ use collision::{
     Continuous,
     Ray3,
     Sphere,
+    Plane,
 };
 use color::*;
 use material::*;
@@ -42,6 +43,20 @@ impl Solid for Sphere<f32> {
                 Some(SolidHit {
                     point: intersection,
                     normal,
+                })
+            },
+            None => None
+        }
+    }
+}
+
+impl Solid for Plane<f32> {
+    fn trace(&self, ray: &Ray3<f32>) -> Option<SolidHit> {
+        match Plane::intersection(self, ray) {
+            Some(intersection) => {
+                Some(SolidHit {
+                    point: intersection,
+                    normal: self.n,
                 })
             },
             None => None

@@ -14,6 +14,7 @@ use raytracer::{
 };
 use collision::{
     Sphere,
+    Plane,
 };
 use cgmath::{
     Matrix4,
@@ -27,7 +28,7 @@ use sdl2::{
 fn main() {
     let camera = {
         let mut mutable_camera = Camera::default();
-        mutable_camera.eye = Matrix4::from_translation(Vector3 { x: 0.0, y: 0.0, z: 5.0 });
+        mutable_camera.eye = Matrix4::from_translation(Vector3 { x: 0.0, y: 0.8, z: 5.0 });
         mutable_camera.image_resolution = (1200, 900);
         mutable_camera
     };
@@ -36,15 +37,29 @@ fn main() {
         objects: vec![
             Box::from(SimpleObject {
                 solid: Box::from(Sphere {
-                    center: Point3 { x: 0.0, y: 0.0, z: 0.0 },
+                    center: Point3 { x: -1.8, y: 1.5, z: 0.0 },
+                    radius: 1.5,
+                }),
+                material: Material::new(),
+            }),
+            Box::from(SimpleObject {
+                solid: Box::from(Sphere {
+                    center: Point3 { x: 1.5, y: 1.0, z: 1.0 },
                     radius: 1.0,
                 }),
                 material: Material::new(),
             }),
             Box::from(SimpleObject {
                 solid: Box::from(Sphere {
-                    center: Point3 { x: 2.0, y: 0.0, z: -3.0 },
-                    radius: 1.0,
+                    center: Point3 { x: 0.2, y: 0.5, z: 2.0 },
+                    radius: 0.5,
+                }),
+                material: Material::new(),
+            }),
+            Box::from(SimpleObject {
+                solid: Box::from(Plane {
+                    n: Vector3 { x: 0.0, y: 1.0, z: 0.0 },
+                    d: 0.0,
                 }),
                 material: Material::new(),
             }),
@@ -53,7 +68,8 @@ fn main() {
         lighting: Lighting {
             ambient: Color::from_rgb(0.0, 0.0, 0.0),
             lights: vec![
-                Light::point_light(Point3 { x: 3.0, y: 3.0, z: 3.0 }),
+                Light::point_light(Point3 { x: 3.0, y: 3.0, z: 4.0 }),
+                Light::point_light(Point3 { x: -3.0, y: 1.0, z: 2.0 }),
             ],
         },
     };
@@ -66,7 +82,7 @@ fn draw_and_wait(scene: &RenderScene) {
     let mut events = ctx.event_pump().unwrap();
     let mut canvas = create_sdl_canvas(&ctx, 1200, 900);
 
-    let frame = draw(&scene);
+    let frame = draw(&scene, &RenderOptions::default());
     render_to_canvas(&mut canvas, &frame);
 
     'main: loop {
