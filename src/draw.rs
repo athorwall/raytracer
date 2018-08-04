@@ -41,7 +41,7 @@ impl Default for RenderOptions {
     fn default() -> Self {
         RenderOptions {
             shadow_bias: 1e-4,
-            max_ray_depth: 2,
+            max_ray_depth: 0,
         }
     }
 }
@@ -59,7 +59,9 @@ pub fn draw(scene: &RenderScene, options: &RenderOptions) -> Frame<Color> {
         for x in 0..width {
             let ray = camera.pixel_ray(x, y);
             match cast_ray(scene, options, &ray, 0) {
-                Some(color) => {
+                Some(mut color) => {
+                    // Not sure when this should happen.
+                    color = color.clamped();
                     frame.set(x, y, color);
                 },
                 None => {},
@@ -74,7 +76,7 @@ pub fn cast_ray(
     scene: &RenderScene,
     options: &RenderOptions,
     ray: &Ray3<f32>,
-    ray_depth: usize
+    ray_depth: usize,
 ) -> Option<Color> {
     match compute_scene_hit(scene, options, ray) {
         Some(hit) => {
@@ -101,7 +103,7 @@ fn compute_scene_hit(
                         if distance < previous_distance {
                             (Some(hit), Some(distance))
                         } else {
-                            current
+                            (Some(previous_hit), Some(previous_distance))
                         }
                     },
                     _ => (Some(hit), Some(distance))
@@ -155,7 +157,7 @@ fn compute_light(
 ) -> Color {
     match light.light_type {
         LightType::Point(ref point_light) => {
-            if hit_visible(
+            if !hit_visible(
                 hit.solid.point,
                 point_light.position,
                 scene,
@@ -166,10 +168,8 @@ fn compute_light(
             let light_direction = point_light.position - hit.solid.point;
             let light_distance = light_direction.magnitude();
             let normalized_light_direction = light_direction / light_distance;
-            let angle = light_direction.dot(hit.solid.normal);
-            let nonnegative_angle = if angle < 0.0 { 0.0 } else { angle };
-
-            let light_intensity = (light.intensity * hit.material.albedo / PI * nonnegative_angle);
+            let m = hit.material.shading.brdf(&-ray.direction, &normalized_light_direction, &hit.solid.normal);
+            let light_intensity = light.intensity * m;
             light.color * (light_intensity / (4.0 * PI * light_distance * light_distance))
         },
         _ => panic!("oh nooooooo"),
@@ -191,7 +191,7 @@ fn hit_visible(
             Some(intersection) => {
                 let distance_to_object = (intersection.solid.point - start).magnitude();
                 if distance_to_object < distance {
-                    return true;
+                    return false;
                 } else {
                     continue;
                 }
@@ -199,5 +199,5 @@ fn hit_visible(
             None => continue,
         }
     }
-    false
+    true
 }

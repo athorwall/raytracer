@@ -70,17 +70,17 @@ fn main() {
             lights: vec![
                 Light::point_light(
                     Point3 { x: 1.4, y: 1.0, z: 3.0 },
-                    100.0,
+                    200.0,
                     Color::from_rgb(1.0, 0.0, 0.0),
                 ),
                 Light::point_light(
                     Point3 { x: -3.0, y: 1.0, z: 2.0 },
-                    100.0,
+                    200.0,
                     Color::from_rgb(0.0, 0.0, 1.0),
                 ),
                 Light::point_light(
                     Point3 { x: 0.0, y: 4.0, z: 2.0 },
-                    100.0,
+                    200.0,
                     Color::from_rgb(0.0, 1.0, 0.0),
                 ),
             ],

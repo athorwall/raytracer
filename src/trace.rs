@@ -1,3 +1,5 @@
+use std::clone::Clone;
+
 use cgmath::{
     BaseFloat,
     InnerSpace,
@@ -64,7 +66,6 @@ impl Solid for Plane<f32> {
     }
 }
 
-#[derive(Copy, Debug, Clone)]
 pub struct SceneObjectHit {
     pub solid: SolidHit,
     pub material: Material,
@@ -86,7 +87,7 @@ impl SceneObject for SimpleObject {
         self.solid.trace(ray).map(|hit| {
             SceneObjectHit {
                 solid: hit,
-                material: self.material,
+                material: self.material.clone(),
             }
         })
     }
