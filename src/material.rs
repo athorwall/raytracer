@@ -26,6 +26,29 @@ impl Shading for SimpleDiffuseShading {
     }
 }
 
+#[derive(Copy, Clone)]
+pub struct PhongShading {
+    pub diffuse_component: f32,
+    pub specular_component: f32,
+    pub specular_exponent: i32,
+}
+
+impl Shading for PhongShading {
+    fn brdf(&self, ray: &Vector3<f32>, light: &Vector3<f32>, normal: &Vector3<f32>) -> f32 {
+        let mut z = light.dot(*normal);
+        if z < 0.0 {
+            z = 0.0;
+        }
+        let diffuse = self.diffuse_component / PI * z;
+
+        let v = -*ray;
+        let r = 2.0 * (normal.dot(*light)) * normal - light;
+        let specular = self.specular_component * (v.dot(r).powi(self.specular_exponent));
+
+        diffuse + specular
+    }
+}
+
 #[derive(Clone)]
 pub struct Material {
     pub diffuse: Color,

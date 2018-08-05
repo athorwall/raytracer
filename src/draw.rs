@@ -169,8 +169,7 @@ fn compute_light(
             let light_distance = light_direction.magnitude();
             let normalized_light_direction = light_direction / light_distance;
             let m = hit.material.shading.brdf(&-ray.direction, &normalized_light_direction, &hit.solid.normal);
-            let light_intensity = light.intensity * m;
-            light.color * (light_intensity / (4.0 * PI * light_distance * light_distance))
+            light.intensity * m / (4.0 * PI * light_distance * light_distance)
         },
         _ => panic!("oh nooooooo"),
     }

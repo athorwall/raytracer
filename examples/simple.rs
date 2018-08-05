@@ -3,6 +3,8 @@ extern crate raytracer;
 extern crate collision;
 extern crate cgmath;
 
+use std::rc::Rc;
+
 use raytracer::{
     camera::*,
     color::*,
@@ -33,6 +35,40 @@ fn main() {
         mutable_camera
     };
 
+    let material1 = Material {
+        diffuse: Color::from_rgb(1.0, 0.0, 0.0),
+        shading: Rc::from(PhongShading {
+            diffuse_component: 0.18,
+            specular_component: 0.1,
+            specular_exponent: 50,
+        }),
+    };
+
+    let material2 = Material {
+        diffuse: Color::from_rgb(0.0, 1.0, 0.0),
+        shading: Rc::from(PhongShading {
+            diffuse_component: 0.18,
+            specular_component: 0.1,
+            specular_exponent: 50,
+        }),
+    };
+
+    let material3 = Material {
+        diffuse: Color::from_rgb(0.0, 0.0, 1.0),
+        shading: Rc::from(PhongShading {
+            diffuse_component: 0.18,
+            specular_component: 0.1,
+            specular_exponent: 50,
+        }),
+    };
+
+    let material4 = Material {
+        diffuse: Color::from_rgb(1.0, 1.0, 1.0),
+        shading: Rc::from(SimpleDiffuseShading {
+            albedo: 0.18,
+        }),
+    };
+
     let scene = RenderScene {
         objects: vec![
             Box::from(SimpleObject {
@@ -40,28 +76,28 @@ fn main() {
                     center: Point3 { x: -1.8, y: 1.5, z: 0.0 },
                     radius: 1.5,
                 }),
-                material: Material::new(),
+                material: material1.clone(),
             }),
             Box::from(SimpleObject {
                 solid: Box::from(Sphere {
                     center: Point3 { x: 1.5, y: 1.0, z: 1.0 },
                     radius: 1.0,
                 }),
-                material: Material::new(),
+                material: material2.clone(),
             }),
             Box::from(SimpleObject {
                 solid: Box::from(Sphere {
                     center: Point3 { x: 0.2, y: 0.5, z: 2.0 },
                     radius: 0.5,
                 }),
-                material: Material::new(),
+                material: material3.clone(),
             }),
             Box::from(SimpleObject {
                 solid: Box::from(Plane {
                     n: Vector3 { x: 0.0, y: 1.0, z: 0.0 },
                     d: 0.0,
                 }),
-                material: Material::new(),
+                material: material4.clone(),
             }),
         ],
         camera,
@@ -70,18 +106,15 @@ fn main() {
             lights: vec![
                 Light::point_light(
                     Point3 { x: 1.4, y: 1.0, z: 3.0 },
-                    200.0,
-                    Color::from_rgb(1.0, 0.0, 0.0),
+                    Color::from_rgb(200.0, 200.0, 200.0),
                 ),
                 Light::point_light(
                     Point3 { x: -3.0, y: 1.0, z: 2.0 },
-                    200.0,
-                    Color::from_rgb(0.0, 0.0, 1.0),
+                    Color::from_rgb(200.0, 200.0, 200.0),
                 ),
                 Light::point_light(
                     Point3 { x: 0.0, y: 4.0, z: 2.0 },
-                    200.0,
-                    Color::from_rgb(0.0, 1.0, 0.0),
+                    Color::from_rgb(200.0, 200.0, 200.0),
                 ),
             ],
         },

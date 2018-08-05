@@ -9,17 +9,15 @@ pub struct Lighting {
 pub struct Light {
     // TODO: make private
     pub light_type: LightType,
-    pub color: Color,
-    pub intensity: f32,
+    pub intensity: Color,
 }
 
 impl Light {
-    pub fn point_light(pos: Point3<f32>, intensity: f32, color: Color) -> Self {
+    pub fn point_light(pos: Point3<f32>, intensity: Color) -> Self {
         Light{
             light_type: LightType::Point(PointLight{
                 position: pos,
             }),
-            color,
             intensity,
         }
     }
@@ -29,8 +27,7 @@ impl Light {
             light_type: LightType::Directional(DirectionalLight{
                 direction: dir / dir.magnitude(),
             }),
-            color: Color::from_rgb(1.0, 1.0, 1.0),
-            intensity: 1.0,
+            intensity: Color::from_rgb(1.0, 1.0, 1.0),
         }
     }
 }
