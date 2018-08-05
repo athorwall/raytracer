@@ -129,7 +129,7 @@ fn draw_hit(
     hit: &SceneObjectHit,
     ray_depth: usize
 ) -> Option<Color> {
-    let light_color = scene.lighting.lights.iter()
+    let light_color: Color = scene.lighting.lights.iter()
         .map(|light| { compute_light(light, scene, options, ray, hit) })
         .sum();
 
@@ -138,7 +138,7 @@ fn draw_hit(
     if ray_depth < options.max_ray_depth {
         cast_ray(scene, options, &reflected_ray, ray_depth + 1)
     } else {
-        Some(light_color)
+        Some(light_color + scene.lighting.ambient)
     }
 }
 
@@ -168,8 +168,13 @@ fn compute_light(
             let light_direction = point_light.position - hit.solid.point;
             let light_distance = light_direction.magnitude();
             let normalized_light_direction = light_direction / light_distance;
-            let m = hit.material.shading.brdf(&-ray.direction, &normalized_light_direction, &hit.solid.normal);
-            light.intensity * m / (4.0 * PI * light_distance * light_distance)
+            let m = hit.material.shading.brdf(
+                &-ray.direction,
+                &normalized_light_direction,
+                &light.intensity,
+                &hit.solid.normal
+            );
+            m / (4.0 * PI * light_distance * light_distance)
         },
         _ => panic!("oh nooooooo"),
     }

@@ -30,41 +30,38 @@ use sdl2::{
 fn main() {
     let camera = {
         let mut mutable_camera = Camera::default();
-        mutable_camera.eye = Matrix4::from_translation(Vector3 { x: 0.0, y: 0.8, z: 5.0 });
+        mutable_camera.eye = Matrix4::from_translation(Vector3 { x: 0.0, y: 1.8, z: 5.0 });
         mutable_camera.image_resolution = (1200, 900);
         mutable_camera
     };
 
     let material1 = Material {
-        diffuse: Color::from_rgb(1.0, 0.0, 0.0),
         shading: Rc::from(PhongShading {
-            diffuse_component: 0.18,
-            specular_component: 0.1,
-            specular_exponent: 50,
+            diffuse_color: Color::from_rgb(0.18, 0.0, 0.0),
+            specular_color: Color::from_rgb(0.05, 0.05, 0.05),
+            specular_exponent: 20,
         }),
     };
 
     let material2 = Material {
-        diffuse: Color::from_rgb(0.0, 1.0, 0.0),
         shading: Rc::from(PhongShading {
-            diffuse_component: 0.18,
-            specular_component: 0.1,
-            specular_exponent: 50,
+            diffuse_color: Color::from_rgb(0.0, 0.18, 0.0),
+            specular_color: Color::from_rgb(0.05, 0.05, 0.05),
+            specular_exponent: 20,
         }),
     };
 
     let material3 = Material {
-        diffuse: Color::from_rgb(0.0, 0.0, 1.0),
         shading: Rc::from(PhongShading {
-            diffuse_component: 0.18,
-            specular_component: 0.1,
-            specular_exponent: 50,
+            diffuse_color: Color::from_rgb(0.0, 0.0, 0.18),
+            specular_color: Color::from_rgb(0.05, 0.05, 0.05),
+            specular_exponent: 20,
         }),
     };
 
     let material4 = Material {
-        diffuse: Color::from_rgb(1.0, 1.0, 1.0),
         shading: Rc::from(SimpleDiffuseShading {
+            diffuse_color: Color::from_rgb(1.0, 1.0, 1.0),
             albedo: 0.18,
         }),
     };
@@ -99,22 +96,39 @@ fn main() {
                 }),
                 material: material4.clone(),
             }),
+            Box::from(SimpleObject {
+                solid: Box::from(Plane {
+                    n: Vector3 { x: 0.0, y: 0.0, z: 1.0 },
+                    d: 10.0,
+                }),
+                material: material4.clone(),
+            }),
+            Box::from(SimpleObject {
+                solid: Box::from(Plane {
+                    n: Vector3 { x: 1.0, y: 0.0, z: 0.0 },
+                    d: 5.0,
+                }),
+                material: material4.clone(),
+            }),
+            Box::from(SimpleObject {
+                solid: Box::from(Plane {
+                    n: Vector3 { x: -1.0, y: 0.0, z: 0.0 },
+                    d: 5.0,
+                }),
+                material: material4.clone(),
+            }),
         ],
         camera,
         lighting: Lighting {
-            ambient: Color::from_rgb(0.0, 0.0, 0.0),
+            ambient: Color::from_rgb(0.03, 0.03, 0.03),
             lights: vec![
                 Light::point_light(
-                    Point3 { x: 1.4, y: 1.0, z: 3.0 },
-                    Color::from_rgb(200.0, 200.0, 200.0),
+                    Point3 { x: 3.4, y: 5.0, z: 5.0 },
+                    Color::from_rgb(1000.0, 1000.0, 1000.0),
                 ),
                 Light::point_light(
-                    Point3 { x: -3.0, y: 1.0, z: 2.0 },
-                    Color::from_rgb(200.0, 200.0, 200.0),
-                ),
-                Light::point_light(
-                    Point3 { x: 0.0, y: 4.0, z: 2.0 },
-                    Color::from_rgb(200.0, 200.0, 200.0),
+                    Point3 { x: -2.4, y: 3.0, z: 3.0 },
+                    Color::from_rgb(1000.0, 1000.0, 1000.0),
                 ),
             ],
         },
